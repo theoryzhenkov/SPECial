@@ -22,11 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install mkdocs-material
-      - run: mkdocs build --strict
+      - uses: astral-sh/setup-uv@v5
+      - run: uv run mkdocs build --strict
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

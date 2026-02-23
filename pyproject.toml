@@ -1,0 +1,8 @@
+[project]
+name = "special-docs"
+version = "0.1.0"
+description = "SPECial documentation site"
+requires-python = ">=3.12"
+dependencies = [
+    "mkdocs-material>=9.6",
+]

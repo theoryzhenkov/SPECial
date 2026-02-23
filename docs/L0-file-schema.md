@@ -125,7 +125,7 @@ SPECial uses `summary` and the dependency graph for incremental navigation — b
 
 Each file's `summary` is the authoritative one-line description of its contents. An agent encountering a file path in a `dependents` list can read just the frontmatter of the referenced file to get its summary and scope, then decide whether to load the full body.
 
-By convention, SPECial files may list their dependants' summaries in the file body. This avoids fetching all dependants' frontmatter to learn their approximate contents. As with other content, if a dependant's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#modified--reviewed).
+By convention, SPECial files may list their dependants' summaries in the file body. This avoids fetching all dependants' frontmatter to learn their approximate contents. As with other content, if a dependant's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#modified-reviewed).
 
 ### Root Index File
 
