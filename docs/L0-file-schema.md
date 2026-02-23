@@ -15,7 +15,7 @@ depends:
 
 SPECial `.md` files include a **body** and **frontmatter**.
 
-## Frontmatter
+## 1. Frontmatter
 
 Frontmatter is a YAML, TOML or JSON block at the beginning of the `.md` file. Frontmatter is used by SPECial to store structured metadata.
 
@@ -34,7 +34,7 @@ dependents:
 ---
 ```
 
-### Schema
+### 1.1. Schema
 
 | Field        | Type       | Required | Description                                                  |
 | ------------ | ---------- | -------- | ------------------------------------------------------------ |
@@ -45,7 +45,7 @@ dependents:
 | `depends`    | `object[]` | no       | This file can become stale after changes to these files.     |
 | `dependents` | `object[]` | no       | These files can become stale after changes to this file.     |
 
-#### Scope
+#### 1.1.1. Scope
 
 | Level                    | Answers                                                                                     | Access                                                                             |
 | ------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -55,7 +55,7 @@ dependents:
 | L2: Structure & Flows    | What are the components, how do they interact, what are the key sequences?                  | An agent reads this to modify or extend the domain.                                |
 | L3: Implementation       | What are the implementation patterns, edge cases, known issues, performance considerations? | An agent reads this to debug or optimize within the domain.                        |
 
-#### Depends
+#### 1.1.2. Depends
 
 If changes to file X can affect file Y, then Y depends on X. For example, if changes in `L0-accessibility` can affect `L1-user-interface`, then `L1-user-interface` sets `depends: [L0-accessibility]`.
 
@@ -79,7 +79,7 @@ depends:
     local: "1.2 Validation rules"
 ```
 
-#### Dependents
+#### 1.1.3. Dependents
 
 Inverse of `depends`. Lists files that depend on this file, used for navigating the dependency graph in the forward direction — after changing a file, its `dependents` tell you which files to check for staleness.
 
@@ -87,7 +87,7 @@ Inverse of `depends`. Lists files that depend on this file, used for navigating 
 
 `dependents` entries follow the same schema and shorthand rules as `depends`.
 
-#### Modified & Reviewed
+#### 1.1.4. Modified & Reviewed
 
 These two fields track documentation staleness and drift.
 
@@ -97,7 +97,7 @@ These two fields track documentation staleness and drift.
 
 The staleness rule: if Y depends on X, and `Y.reviewed < X.modified`, then Y is **potentially stale**. This requires verification. If Y is still consistent, bump `Y.reviewed`. If edits are required, bump both `Y.modified` and `Y.reviewed` — the modified change then propagates outward through Y's own dependents, and the process repeats until the entire dependency graph is consistent.
 
-## File Naming
+## 2. File Naming
 
 SPECial files encode their scope level in the file name:
 
@@ -117,17 +117,17 @@ L2-*.md  →  all design docs
 L3-*.md  →  all implementation docs
 ```
 
-## Navigation
+## 3. Navigation
 
 SPECial uses `summary` and the dependency graph for incremental navigation — both for human readers and agents managing context budgets.
 
-### Summary
+### 3.1. Summary
 
 Each file's `summary` is the authoritative one-line description of its contents. An agent encountering a file path in a `dependents` list can read just the frontmatter of the referenced file to get its summary and scope, then decide whether to load the full body.
 
 By convention, SPECial files may list their dependants' summaries in the file body. This avoids fetching all dependants' frontmatter to learn their approximate contents. As with other content, if a dependant's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#modified-reviewed).
 
-### Root Index File
+### 3.2. Root Index File
 
 A **root index file** (configured as `root` in `special.conf.toml`, default: `README`) serves as the entry point, effectively an `L-1` scope. It may or may not list `L0` files as dependents — [file discovery](#file-naming) does not depend on it.
 

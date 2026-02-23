@@ -10,15 +10,19 @@ dependents:
 
 # SPECial
 
-SPECial is a lightweight specification / documentation standard. It is designed to provide a solid foundation for spec-driven software development, but is adaptable to other domains. SPECial is designed primarily for markdown — this document format was chosen for its wide adoption and simplicity.
+## 1. Overview
+
+SPECial is a lightweight specification / documentation standard. It is designed to perform optimally with AI agents and minimise specification drift. To this end, SPECial avoids relying on tooling, custom formats or any external state — all the information required to traverse and maintain your project's documentation is available within files themselves. 
+
+SPECial attempts to reduce irrelevant context LLM agents accumulate, achieving better performance for projects with large documentations. For this purpose, SPECial provides guidance towards file body formatting and structure alongside the file organisation directives. 
+
+SPECial was designed by Theo Ryzhenkov and is distributed under MIT license. Documentation for SPECial follows SPECial standard. 
 
 !!! note
 
     Currently, SPECial doesn't provide any tooling: linters, formatters, drift detection, etc. If the standard's design receives wider adoption, I plan to develop a SPECial CLI / SDK. Often, the documentation is written as if tooling existed — this is in order to a) specify future tooling, and design with it in mind b) to allow agents to deterministically follow the specification.
 
-## Pages
+## 1. Quickstart
 
-| Page                                         | Scope | Summary                                        |
-| -------------------------------------------- | ----- | ---------------------------------------------- |
-| [Project Structure](L0-project-structure.md) | `L0`  | Configuration, path resolution, project layout |
-| [File Schema](L0-file-schema.md)             | `L0`  | Frontmatter, file naming, navigation           |
+
+

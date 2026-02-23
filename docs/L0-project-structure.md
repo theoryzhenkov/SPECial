@@ -14,7 +14,7 @@ dependents:
 
 A SPECial project is a collection of files downstream from a **project root**.
 
-## Configuration
+## 1. Configuration
 
 The project root is identified by the presence of `special.conf.toml`. If no `special.conf.toml` is present in the working directory, SPECial treats working directory as project root with default values.
 
@@ -29,7 +29,7 @@ paths = ["."]           # directories containing SPECial files (default: ["."])
 | `root`  | `string`   | `"README"` | Entry point file, without `.md` extension.                       |
 | `paths` | `string[]` | `["."]`    | Directories to scan for SPECial files, relative to project root. |
 
-## Path Resolution
+## 2. Path Resolution
 
 All SPECial paths are resolved **relative to the project root**, without the `.md` extension.
 
