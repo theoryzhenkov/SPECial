@@ -1,6 +1,6 @@
 ---
 scope: L0
-summary: "Frontmatter, file naming, navigation"
+summary: "SPECial file standard"
 modified: 2026-02-23
 reviewed: 2026-02-23
 depends:
@@ -11,9 +11,9 @@ depends:
     local: "File Naming"
 ---
 
-# SPECial File Schema
+# SPECial file structure
 
-SPECial `.md` files include a **body** and **frontmatter**.
+Markdown SPECial files include a **body** and YAML, TOML or JSON **frontmatter**. While documentation for a project can consist of files other than Markdown, SPECial relies on some sort of per-file metadata storage to provide assistance with specification drift and navigation. 
 
 ## 1. Frontmatter
 
@@ -36,24 +36,24 @@ dependents:
 
 ### 1.1. Schema
 
-| Field        | Type       | Required | Description                                                  |
-| ------------ | ---------- | -------- | ------------------------------------------------------------ |
-| `scope`      | `enum`     | yes      | Depth of detail: `root`, L0–L3. Also expressed in file name. |
-| `summary`    | `string`   | yes      | One-line description, used for [navigation](#navigation).    |
-| `modified`   | `date`     | yes      | Last content change, ISO 8601.                               |
-| `reviewed`   | `date`     | yes      | Last verified consistency timestamp, ISO 8601.               |
-| `depends`    | `object[]` | no       | This file can become stale after changes to these files.     |
-| `dependents` | `object[]` | no       | These files can become stale after changes to this file.     |
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `scope` | `enum` | yes | Depth of detail: `root`, L0–L3. Also expressed in file name. |
+| `summary` | `string` | yes | One-line description, used for [navigation](#3-navigation). |
+| `modified` | `date` | yes | Last content change, ISO 8601. |
+| `reviewed` | `date` | yes | Last verified consistency timestamp, ISO 8601. |
+| `depends` | `object[]` | no | This file can become stale after changes to these files. |
+| `dependents` | `object[]` | no | These files can become stale after changes to this file. |
 
 #### 1.1.1. Scope
 
-| Level                    | Answers                                                                                     | Access                                                                             |
-| ------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| root: Index              | What domains exist in this project?                                                         | Entry point. An agent reads this first to orient and pick a domain.                |
-| L0: Context & Motivation | What is this domain, why does it exist, what are the stakes?                                | An agent reads this to decide whether this domain is relevant to its task.         |
-| L1: Contracts            | What are the interfaces, invariants, constraints, rules?                                    | An agent reads this to work _with_ the domain without understanding its internals. |
-| L2: Structure & Flows    | What are the components, how do they interact, what are the key sequences?                  | An agent reads this to modify or extend the domain.                                |
-| L3: Implementation       | What are the implementation patterns, edge cases, known issues, performance considerations? | An agent reads this to debug or optimize within the domain.                        |
+| Level | Answers | Access |
+| --- | --- | --- |
+| root: Index | What domains exist in this project? | Entry point. An agent reads this first to orient and pick a domain. |
+| L0: Context & Motivation | What is this domain, why does it exist, what are the stakes? | An agent reads this to decide whether this domain is relevant to its task. |
+| L1: Contracts | What are the interfaces, invariants, constraints, rules? | An agent reads this to work _with_ the domain without understanding its internals. |
+| L2: Structure & Flows | What are the components, how do they interact, what are the key sequences? | An agent reads this to modify or extend the domain. |
+| L3: Implementation | What are the implementation patterns, edge cases, known issues, performance considerations? | An agent reads this to debug or optimize within the domain. |
 
 #### 1.1.2. Depends
 
@@ -61,11 +61,11 @@ If changes to file X can affect file Y, then Y depends on X. For example, if cha
 
 `depends` is the **source of truth** for staleness detection. Each entry has the following schema:
 
-| Field     | Type     | Required | Description                                                                                                  |
-| --------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| `path`    | `string` | yes      | Path to the dependency file.                                                                                 |
-| `section` | `string` | no       | Heading in the dependency file that this file depends on. If omitted, the dependency is file-level.          |
-| `local`   | `string` | no       | Heading in this file that is dependent on the `section`. If omitted, the whole file is considered dependent. |
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `path` | `string` | yes | Path to the dependency file. |
+| `section` | `string` | no | Heading in the dependency file that this file depends on. If omitted, the dependency is file-level. |
+| `local` | `string` | no | Heading in this file that is dependent on the `section`. If omitted, the whole file is considered dependent. |
 
 When `section` and `local` are specified, staleness is scoped: only changes under that heading in the dependency are relevant, and only the local heading needs review.
 
@@ -125,11 +125,11 @@ SPECial uses `summary` and the dependency graph for incremental navigation — b
 
 Each file's `summary` is the authoritative one-line description of its contents. An agent encountering a file path in a `dependents` list can read just the frontmatter of the referenced file to get its summary and scope, then decide whether to load the full body.
 
-By convention, SPECial files may list their dependants' summaries in the file body. This avoids fetching all dependants' frontmatter to learn their approximate contents. As with other content, if a dependant's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#modified-reviewed).
+By convention, SPECial files may list their dependants' summaries in the file body. This avoids fetching all dependants' frontmatter to learn their approximate contents. As with other content, if a dependant's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#114-modified-reviewed).
 
 ### 3.2. Root Index File
 
-A **root index file** (configured as `root` in `special.conf.toml`, default: `README`) serves as the entry point, effectively an `L-1` scope. It may or may not list `L0` files as dependents — [file discovery](#file-naming) does not depend on it.
+A **root index file** (configured as `root` in `special.conf.toml`, default: `README`) serves as the entry point, effectively an `L-1` scope. It may or may not list `L0` files as dependents — [file discovery](#2-file-naming) does not depend on it.
 
 ```yaml
 # README.md

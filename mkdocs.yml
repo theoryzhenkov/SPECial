@@ -44,4 +44,6 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Project Structure: L0-project-structure.md
-  - File Schema: L0-file-schema.md
+  - File Structure: L0-file-structure.md
+  - Documentation Style: L0-documentation-style.md
+  - Tooling: L0-tooling.md

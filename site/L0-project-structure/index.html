@@ -14,7 +14,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../L0-file-schema/">
+        <link rel="next" href="../L0-file-structure/">
       
       
         
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#project-structure" class="md-skip">
+        <a href="#special-project-structure" class="md-skip">
           Skip to content
         </a>
       
@@ -347,10 +347,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#1-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        1. Configuration
       
     </span>
   </a>
@@ -358,10 +358,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-resolution" class="md-nav__link">
+  <a href="#2-path-resolution" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path Resolution
+        2. Path Resolution
       
     </span>
   </a>
@@ -383,14 +383,68 @@
   
   
     <li class="md-nav__item">
-      <a href="../L0-file-schema/" class="md-nav__link">
+      <a href="../L0-file-structure/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    File Schema
+    File Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../L0-documentation-style/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation Style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../L0-tooling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tooling
   
 
     
@@ -423,9 +477,10 @@
   
 
 
-<h1 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h1>
-<p>A SPECial project is a collection of files downstream from a <strong>project root</strong>.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<h1 id="special-project-structure">SPECial project structure<a class="headerlink" href="#special-project-structure" title="Permanent link">&para;</a></h1>
+<p>A SPECial project is a collection of <a href="../L0-file-structure/">SPECial files</a> downstream from a <strong>project root</strong> located at <strong>paths</strong>. Together, these files form a documentation / specification. </p>
+<p>SPECial provides a project structure mainly to allow <a href="../L0-tooling/">SPECial CLI</a>; otherwise, <a href="../L0-file-structure/">SPECial files</a> form independent cliques and can be located anywhere. If you are not using the <a href="../L0-tooling/">SPECial CLI</a>, consider SPECial project structure standard merely a recommendation. </p>
+<h2 id="1-configuration">1. Configuration<a class="headerlink" href="#1-configuration" title="Permanent link">&para;</a></h2>
 <p>The project root is identified by the presence of <code>special.conf.toml</code>. If no <code>special.conf.toml</code> is present in the working directory, SPECial treats working directory as project root with default values.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># special.conf.toml</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;README&quot;</span><span class="w">         </span><span class="c1"># entry point file (default: &quot;README&quot;)</span>
@@ -455,7 +510,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="path-resolution">Path Resolution<a class="headerlink" href="#path-resolution" title="Permanent link">&para;</a></h2>
+<h2 id="2-path-resolution">2. Path Resolution<a class="headerlink" href="#2-path-resolution" title="Permanent link">&para;</a></h2>
 <p>All SPECial paths are resolved <strong>relative to the project root</strong>, without the <code>.md</code> extension.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># special.conf.toml</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">paths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;docs&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;src&quot;</span><span class="p">]</span>
@@ -474,7 +529,7 @@
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>SPECial is fully compatible with <code>mkdocs</code>. You can add your mkdocs <code>docs_dir</code> to <code>paths</code>, and serve SPECial files as public documentation, utilising all of SPECial features for maintaining documentation and synchronising it with live code and specification.</p>
+<p>SPECial is fully compatible with <code>mkdocs</code> (and possibly other markdown static site builders). You can add your mkdocs <code>docs_dir</code> to <code>paths</code>, and serve SPECial files as public documentation, utilising all of SPECial features for maintaining documentation and synchronising it with live code and specification.</p>
 </div>
 
 

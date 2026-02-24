@@ -1,18 +1,20 @@
 ---
 scope: L0
-summary: "Configuration, path resolution, project layout"
+summary: "SPECial project structure standard"
 modified: 2026-02-23
 reviewed: 2026-02-23
 depends:
   - path: index
     local: "Pages"
 dependents:
-  - docs/L0-file-schema
+  - docs/L0-file-structure
 ---
 
-# Project Structure
+# SPECial project structure
 
-A SPECial project is a collection of files downstream from a **project root**.
+A SPECial project is a collection of [SPECial files](L0-file-structure.md) downstream from a **project root** located at **paths**. Together, these files form a documentation / specification. 
+
+SPECial provides a project structure mainly to allow [SPECial CLI](L0-tooling.md); otherwise, [SPECial files](L0-file-structure.md) form independent cliques and can be located anywhere. If you are not using the [SPECial CLI](L0-tooling.md), consider SPECial project structure standard merely a recommendation. 
 
 ## 1. Configuration
 
@@ -24,10 +26,10 @@ root = "README"         # entry point file (default: "README")
 paths = ["."]           # directories containing SPECial files (default: ["."])
 ```
 
-| Field   | Type       | Default    | Description                                                      |
-| ------- | ---------- | ---------- | ---------------------------------------------------------------- |
-| `root`  | `string`   | `"README"` | Entry point file, without `.md` extension.                       |
-| `paths` | `string[]` | `["."]`    | Directories to scan for SPECial files, relative to project root. |
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `root` | `string` | `"README"` | Entry point file, without `.md` extension. |
+| `paths` | `string[]` | `["."]` | Directories to scan for SPECial files, relative to project root. |
 
 ## 2. Path Resolution
 
@@ -54,4 +56,4 @@ project/
 
 !!! note
 
-    SPECial is fully compatible with `mkdocs`. You can add your mkdocs `docs_dir` to `paths`, and serve SPECial files as public documentation, utilising all of SPECial features for maintaining documentation and synchronising it with live code and specification.
+    SPECial is fully compatible with `mkdocs` (and possibly other markdown static site builders). You can add your mkdocs `docs_dir` to `paths`, and serve SPECial files as public documentation, utilising all of SPECial features for maintaining documentation and synchronising it with live code and specification.
