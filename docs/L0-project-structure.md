@@ -8,6 +8,7 @@ depends:
     local: "Pages"
 dependents:
   - docs/L0-file-structure
+  - docs/L0-tooling
 ---
 
 # SPECial project structure

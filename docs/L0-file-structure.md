@@ -9,6 +9,8 @@ depends:
   - path: docs/L0-project-structure
     section: "Path Resolution"
     local: "File Naming"
+dependents:
+  - docs/L0-tooling
 ---
 
 # SPECial file structure
