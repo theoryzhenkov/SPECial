@@ -163,18 +163,22 @@ Type and lifecycle can each be expressed as an **uppercase filename prefix** or 
 | Type (e.g. `PLAN`)    | `PLAN-`         | `plan/`           |
 | Lifecycle `ephemeral` | `EPH-`          | `eph/`            |
 
-The ordering in the file path is: lifecycle, then type, then scope. All of the following encode the same file (`lifecycle: ephemeral`, `type: PLAN`, `scope: L1`):
+The ordering of lifecycle, type, and scope segments in the file path is a project-level convention. SPECial does not enforce a particular order — choose whichever grouping makes navigating your documentation easiest and stay consistent within the project. The [SPECial CLI](L0-tooling.md) reads the configured order from [`naming_order`](L0-project-structure.md#1-configuration) in `special.conf.toml`.
+
+All of the following encode the same file (`lifecycle: ephemeral`, `type: PLAN`, `scope: L1`):
 
 ```
-# all prefixes
+# lifecycle → type → scope (default)
 docs/security/EPH-PLAN-L1-auth-refactor.md
-
-# all directories
 docs/security/eph/plan/L1-auth-refactor.md
 
-# mixed
-docs/security/eph/PLAN-L1-auth-refactor.md
-docs/security/plan/EPH-L1-auth-refactor.md
+# type → lifecycle → scope
+docs/security/PLAN-EPH-L1-auth-refactor.md
+docs/security/plan/eph/L1-auth-refactor.md
+
+# type → scope (lifecycle implied by type)
+docs/security/PLAN-L1-auth-refactor.md
+docs/security/plan/L1-auth-refactor.md
 ```
 
 Standard permanent documentation uses neither type nor lifecycle encoding — just the scope prefix:

@@ -1,8 +1,8 @@
 ---
 scope: L0
 summary: "SPECial project structure standard"
-modified: 2026-02-23
-reviewed: 2026-02-23
+modified: 2026-02-27
+reviewed: 2026-02-27
 depends:
   - path: index
     local: "Pages"
@@ -12,9 +12,9 @@ dependents:
 
 # SPECial project structure
 
-A SPECial project is a collection of [SPECial files](L0-file-structure.md) downstream from a **project root** located at **paths**. Together, these files form a documentation / specification. 
+A SPECial project is a collection of [SPECial files](L0-file-structure.md) downstream from a **project root** located at **paths**. Together, these files form a documentation / specification.
 
-SPECial provides a project structure mainly to allow [SPECial CLI](L0-tooling.md); otherwise, [SPECial files](L0-file-structure.md) form independent cliques and can be located anywhere. If you are not using the [SPECial CLI](L0-tooling.md), consider SPECial project structure standard merely a recommendation. 
+SPECial provides a project structure mainly to allow [SPECial CLI](L0-tooling.md); otherwise, [SPECial files](L0-file-structure.md) form independent cliques and can be located anywhere. If you are not using the [SPECial CLI](L0-tooling.md), consider SPECial project structure standard merely a recommendation.
 
 ## 1. Configuration
 
@@ -22,14 +22,16 @@ The project root is identified by the presence of `special.conf.toml`. If no `sp
 
 ```toml
 # special.conf.toml
-root = "README"         # entry point file (default: "README")
-paths = ["."]           # directories containing SPECial files (default: ["."])
+root = "README"                            # entry point file (default: "README")
+paths = ["."]                              # directories containing SPECial files (default: ["."])
+naming_order = ["lifecycle", "type", "scope"]  # segment order in file paths (default)
 ```
 
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| `root` | `string` | `"README"` | Entry point file, without `.md` extension. |
-| `paths` | `string[]` | `["."]` | Directories to scan for SPECial files, relative to project root. |
+| Field          | Type       | Default                          | Description                                                                                                                                         |
+| -------------- | ---------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `root`         | `string`   | `"README"`                       | Entry point file, without `.md` extension.                                                                                                          |
+| `paths`        | `string[]` | `["."]`                          | Directories to scan for SPECial files, relative to project root.                                                                                    |
+| `naming_order` | `string[]` | `["lifecycle", "type", "scope"]` | Order of metadata segments in file paths. Used by CLI for parsing and generating file names. See [File naming](L0-file-structure.md#2-file-naming). |
 
 ## 2. Path Resolution
 
