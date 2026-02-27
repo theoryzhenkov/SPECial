@@ -43,6 +43,7 @@ dependents:
 | `modified`   | `date`     | yes      | Last content change, ISO 8601.                                         |
 | `reviewed`   | `date`     | yes      | Last verified consistency timestamp, ISO 8601.                         |
 | `lifecycle`  | `enum`     | no       | `permanent` (default) or `ephemeral`. See [Lifecycle](#115-lifecycle). |
+| `type`       | `string`   | no       | Document type. Also expressed in file name. See [Type](#116-type).     |
 | `depends`    | `object[]` | no       | This file can become stale after changes to these files.               |
 | `dependents` | `object[]` | no       | These files can become stale after changes to this file.               |
 
@@ -107,7 +108,9 @@ The staleness rule: if Y depends on X, and `Y.reviewed < X.modified`, then Y is 
 | `permanent` | Default. Omitting the field is equivalent to `permanent`. Part of the long-lived documentation.                     |
 | `ephemeral` | Temporary specification. Expected to be deleted when the work it supports is complete (e.g. after a branch merges). |
 
-Ephemeral files use normal scope prefixes (`L0-`, `L1-`, etc.) and follow the same frontmatter schema. The differences are in how they participate in the dependency graph:
+Some [document types](#116-type) default to `ephemeral`. An explicit `lifecycle` value in frontmatter always takes precedence over the type-implied default.
+
+Ephemeral files follow the same frontmatter schema as permanent files. The differences are in how they participate in the dependency graph:
 
 - **Ephemeral → permanent `depends`: one-way.** An ephemeral file may `depends` on permanent files. The permanent files do **not** add matching `dependents` entries. Since `dependents` carries [no semantic weight](#113-dependents), this does not affect staleness detection.
 - **Permanent → ephemeral `depends`: forbidden.** A permanent file must never `depends` on an ephemeral file. This ensures deleting ephemeral files never creates dangling references in permanent documentation.
@@ -116,10 +119,10 @@ Ephemeral files use normal scope prefixes (`L0-`, `L1-`, etc.) and follow the sa
 Staleness tracking works normally for ephemeral files: if a permanent dependency is modified, the ephemeral file is flagged stale. The difference is that staleness never propagates _from_ an ephemeral file into permanent files, because no permanent file depends on it.
 
 ```yaml
-# Example: feature plan depending on permanent auth contracts
+# PLAN-L1-auth-refactor.md — type implies ephemeral, no explicit lifecycle needed
 ---
 scope: L1
-lifecycle: ephemeral
+type: PLAN
 summary: "Auth refactor plan — migrate to OAuth2 PKCE"
 modified: 2026-02-27
 reviewed: 2026-02-27
@@ -129,24 +132,41 @@ depends:
 ---
 ```
 
+#### 1.1.6. Type
+
+`type` classifies the purpose of a document. Standard documentation files omit the field. Typed documents use an uppercase string that is also encoded in the [file name](#2-file-naming).
+
+The type set is open — any uppercase string is valid. The following types are recommended:
+
+| Type     | Purpose                                          | Default lifecycle |
+| -------- | ------------------------------------------------ | ----------------- |
+| _(none)_ | Standard documentation                           | `permanent`       |
+| `PLAN`   | Implementation plans, feature designs            | `ephemeral`       |
+| `ISSUE`  | Tracked problems, bugs, improvement requests     | `ephemeral`       |
+| `RFC`    | Requests for comment, proposals under discussion | `ephemeral`       |
+
+When a type has a default lifecycle, that default applies unless overridden by an explicit `lifecycle` field. Custom types default to `permanent`.
+
 ## 2. File Naming
 
-SPECial files encode their scope level in the file name:
+SPECial files encode their scope level — and optionally their [type](#116-type) — in the file name:
 
 ```
-L0-security.md
+L0-security.md                  # standard documentation
 L1-authentication.md
-L2-auth-flow.md
-L3-token-validation.md
+PLAN-L1-auth-refactor.md        # typed: PLAN
+ISSUE-L2-memory-leak.md         # typed: ISSUE
 ```
 
-The prefix makes scope immediately visible in file listings and allows tools to infer scope without parsing frontmatter. CLI tools can use globs to efficiently query SPECial files:
+The naming pattern is `{TYPE-}L{n}-{name}.md`. The type prefix is uppercase, followed by a hyphen, followed by the scope prefix. Standard documentation files omit the type prefix.
+
+CLI tools can use globs to query along either axis:
 
 ```
-L0-*.md  →  all domains
-L1-*.md  →  all contracts
-L2-*.md  →  all design docs
-L3-*.md  →  all implementation docs
+L1-*.md       →  all standard L1 contracts
+PLAN-*.md     →  all plans, any scope
+PLAN-L1-*.md  →  all L1 plans
+*L1-*.md      →  all L1 files including typed ones
 ```
 
 ## 3. Navigation
