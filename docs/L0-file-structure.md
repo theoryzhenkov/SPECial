@@ -110,6 +110,8 @@ The staleness rule: if Y depends on X, and `Y.reviewed < X.modified`, then Y is 
 
 Some [document types](#116-type) default to `ephemeral`. An explicit `lifecycle` value in frontmatter always takes precedence over the type-implied default.
 
+Lifecycle can also be encoded in [file naming](#2-file-naming) via the `EPH` prefix or `eph/` directory segment. Frontmatter is the source of truth.
+
 Ephemeral files follow the same frontmatter schema as permanent files. The differences are in how they participate in the dependency graph:
 
 - **Ephemeral → permanent `depends`: one-way.** An ephemeral file may `depends` on permanent files. The permanent files do **not** add matching `dependents` entries. Since `dependents` carries [no semantic weight](#113-dependents), this does not affect staleness detection.
@@ -118,23 +120,9 @@ Ephemeral files follow the same frontmatter schema as permanent files. The diffe
 
 Staleness tracking works normally for ephemeral files: if a permanent dependency is modified, the ephemeral file is flagged stale. The difference is that staleness never propagates _from_ an ephemeral file into permanent files, because no permanent file depends on it.
 
-```yaml
-# PLAN-L1-auth-refactor.md — type implies ephemeral, no explicit lifecycle needed
----
-scope: L1
-type: PLAN
-summary: "Auth refactor plan — migrate to OAuth2 PKCE"
-modified: 2026-02-27
-reviewed: 2026-02-27
-depends:
-  - path: docs/L1-authentication
-    section: "2. Token lifecycle"
----
-```
-
 #### 1.1.6. Type
 
-`type` classifies the purpose of a document. Standard documentation files omit the field. Typed documents use an uppercase string that is also encoded in the [file name](#2-file-naming).
+`type` classifies the purpose of a document. Standard documentation files omit the field.
 
 The type set is open — any uppercase string is valid. The following types are recommended:
 
@@ -147,26 +135,77 @@ The type set is open — any uppercase string is valid. The following types are 
 
 When a type has a default lifecycle, that default applies unless overridden by an explicit `lifecycle` field. Custom types default to `permanent`.
 
+Type can also be encoded in [file naming](#2-file-naming) via a filename prefix or directory segment. Frontmatter is the source of truth.
+
 ## 2. File Naming
 
-SPECial files encode their scope level — and optionally their [type](#116-type) — in the file name:
+SPECial files encode metadata in two places: **frontmatter** (source of truth) and the **file path** (discoverability aid). The file path can encode scope, [type](#116-type), and [lifecycle](#115-lifecycle) using filename prefixes or directory segments interchangeably.
+
+### 2.1. Scope prefix
+
+Every SPECial file encodes its scope level as a filename prefix:
 
 ```
-L0-security.md                  # standard documentation
+L0-security.md
 L1-authentication.md
-PLAN-L1-auth-refactor.md        # typed: PLAN
-ISSUE-L2-memory-leak.md         # typed: ISSUE
+L2-auth-flow.md
+L3-token-validation.md
 ```
 
-The naming pattern is `{TYPE-}L{n}-{name}.md`. The type prefix is uppercase, followed by a hyphen, followed by the scope prefix. Standard documentation files omit the type prefix.
+The prefix makes scope immediately visible in file listings and allows tools to infer scope without parsing frontmatter.
 
-CLI tools can use globs to query along either axis:
+### 2.2. Type and lifecycle encoding
+
+Type and lifecycle can each be expressed as an **uppercase filename prefix** or a **lowercase directory segment**. These two forms are interchangeable — a project may use either or both, as long as the encoding is consistent with frontmatter.
+
+| Encoding              | Filename prefix | Directory segment |
+| --------------------- | --------------- | ----------------- |
+| Type (e.g. `PLAN`)    | `PLAN-`         | `plan/`           |
+| Lifecycle `ephemeral` | `EPH-`          | `eph/`            |
+
+The ordering in the file path is: lifecycle, then type, then scope. All of the following encode the same file (`lifecycle: ephemeral`, `type: PLAN`, `scope: L1`):
 
 ```
-L1-*.md       →  all standard L1 contracts
-PLAN-*.md     →  all plans, any scope
-PLAN-L1-*.md  →  all L1 plans
-*L1-*.md      →  all L1 files including typed ones
+# all prefixes
+docs/security/EPH-PLAN-L1-auth-refactor.md
+
+# all directories
+docs/security/eph/plan/L1-auth-refactor.md
+
+# mixed
+docs/security/eph/PLAN-L1-auth-refactor.md
+docs/security/plan/EPH-L1-auth-refactor.md
+```
+
+Standard permanent documentation uses neither type nor lifecycle encoding — just the scope prefix:
+
+```
+docs/security/L0-security.md
+```
+
+When type already implies ephemeral lifecycle (e.g. `PLAN`), the `EPH` encoding is redundant and can be omitted:
+
+```
+docs/security/plan/L1-auth-refactor.md      # type implies ephemeral
+docs/security/PLAN-L1-auth-refactor.md       # same, prefix style
+```
+
+### 2.3. Glob patterns
+
+The two encoding styles give different glob ergonomics. Choose whichever fits the project:
+
+```
+# prefix style
+L1-*.md              →  all standard L1 contracts
+PLAN-*.md            →  all plans (any scope)
+PLAN-L1-*.md         →  all L1 plans
+EPH-*.md             →  all ephemeral files (prefix-encoded)
+*L1-*.md             →  all L1 files including typed ones
+
+# directory style
+plan/L1-*.md         →  all L1 plans
+plan/**/*.md         →  all plans (any scope)
+eph/**/*.md          →  all ephemeral files (directory-encoded)
 ```
 
 ## 3. Navigation
