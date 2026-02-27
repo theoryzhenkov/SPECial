@@ -1,8 +1,8 @@
 ---
 scope: L0
 summary: "SPECial file standard"
-modified: 2026-02-23
-reviewed: 2026-02-23
+modified: 2026-02-27
+reviewed: 2026-02-27
 depends:
   - path: index
     local: "Pages"
@@ -13,7 +13,7 @@ depends:
 
 # SPECial file structure
 
-Markdown SPECial files include a **body** and YAML, TOML or JSON **frontmatter**. While documentation for a project can consist of files other than Markdown, SPECial relies on some sort of per-file metadata storage to provide assistance with specification drift and navigation. 
+Markdown SPECial files include a **body** and YAML, TOML or JSON **frontmatter**. While documentation for a project can consist of files other than Markdown, SPECial relies on some sort of per-file metadata storage to provide assistance with specification drift and navigation.
 
 ## 1. Frontmatter
 
@@ -36,24 +36,25 @@ dependents:
 
 ### 1.1. Schema
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `scope` | `enum` | yes | Depth of detail: `root`, L0–L3. Also expressed in file name. |
-| `summary` | `string` | yes | One-line description, used for [navigation](#3-navigation). |
-| `modified` | `date` | yes | Last content change, ISO 8601. |
-| `reviewed` | `date` | yes | Last verified consistency timestamp, ISO 8601. |
-| `depends` | `object[]` | no | This file can become stale after changes to these files. |
-| `dependents` | `object[]` | no | These files can become stale after changes to this file. |
+| Field        | Type       | Required | Description                                                            |
+| ------------ | ---------- | -------- | ---------------------------------------------------------------------- |
+| `scope`      | `enum`     | yes      | Depth of detail: `root`, L0–L3. Also expressed in file name.           |
+| `summary`    | `string`   | yes      | One-line description, used for [navigation](#3-navigation).            |
+| `modified`   | `date`     | yes      | Last content change, ISO 8601.                                         |
+| `reviewed`   | `date`     | yes      | Last verified consistency timestamp, ISO 8601.                         |
+| `lifecycle`  | `enum`     | no       | `permanent` (default) or `ephemeral`. See [Lifecycle](#115-lifecycle). |
+| `depends`    | `object[]` | no       | This file can become stale after changes to these files.               |
+| `dependents` | `object[]` | no       | These files can become stale after changes to this file.               |
 
 #### 1.1.1. Scope
 
-| Level | Answers | Access |
-| --- | --- | --- |
-| root: Index | What domains exist in this project? | Entry point. An agent reads this first to orient and pick a domain. |
-| L0: Context & Motivation | What is this domain, why does it exist, what are the stakes? | An agent reads this to decide whether this domain is relevant to its task. |
-| L1: Contracts | What are the interfaces, invariants, constraints, rules? | An agent reads this to work _with_ the domain without understanding its internals. |
-| L2: Structure & Flows | What are the components, how do they interact, what are the key sequences? | An agent reads this to modify or extend the domain. |
-| L3: Implementation | What are the implementation patterns, edge cases, known issues, performance considerations? | An agent reads this to debug or optimize within the domain. |
+| Level                    | Answers                                                                                     | Access                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| root: Index              | What domains exist in this project?                                                         | Entry point. An agent reads this first to orient and pick a domain.                |
+| L0: Context & Motivation | What is this domain, why does it exist, what are the stakes?                                | An agent reads this to decide whether this domain is relevant to its task.         |
+| L1: Contracts            | What are the interfaces, invariants, constraints, rules?                                    | An agent reads this to work _with_ the domain without understanding its internals. |
+| L2: Structure & Flows    | What are the components, how do they interact, what are the key sequences?                  | An agent reads this to modify or extend the domain.                                |
+| L3: Implementation       | What are the implementation patterns, edge cases, known issues, performance considerations? | An agent reads this to debug or optimize within the domain.                        |
 
 #### 1.1.2. Depends
 
@@ -61,11 +62,11 @@ If changes to file X can affect file Y, then Y depends on X. For example, if cha
 
 `depends` is the **source of truth** for staleness detection. Each entry has the following schema:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `path` | `string` | yes | Path to the dependency file. |
-| `section` | `string` | no | Heading in the dependency file that this file depends on. If omitted, the dependency is file-level. |
-| `local` | `string` | no | Heading in this file that is dependent on the `section`. If omitted, the whole file is considered dependent. |
+| Field     | Type     | Required | Description                                                                                                  |
+| --------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `path`    | `string` | yes      | Path to the dependency file.                                                                                 |
+| `section` | `string` | no       | Heading in the dependency file that this file depends on. If omitted, the dependency is file-level.          |
+| `local`   | `string` | no       | Heading in this file that is dependent on the `section`. If omitted, the whole file is considered dependent. |
 
 When `section` and `local` are specified, staleness is scoped: only changes under that heading in the dependency are relevant, and only the local heading needs review.
 
@@ -96,6 +97,37 @@ These two fields track documentation staleness and drift.
 **`reviewed`** is bumped when you verify that the file is faithful to all files it depends on. Reviewing does _not_ bump `modified` unless the content also changes.
 
 The staleness rule: if Y depends on X, and `Y.reviewed < X.modified`, then Y is **potentially stale**. This requires verification. If Y is still consistent, bump `Y.reviewed`. If edits are required, bump both `Y.modified` and `Y.reviewed` — the modified change then propagates outward through Y's own dependents, and the process repeats until the entire dependency graph is consistent.
+
+#### 1.1.5. Lifecycle
+
+`lifecycle` distinguishes permanent documentation from temporary specifications that exist for a bounded period — feature plans, implementation designs, branch-scoped work.
+
+| Value       | Meaning                                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| `permanent` | Default. Omitting the field is equivalent to `permanent`. Part of the long-lived documentation.                     |
+| `ephemeral` | Temporary specification. Expected to be deleted when the work it supports is complete (e.g. after a branch merges). |
+
+Ephemeral files use normal scope prefixes (`L0-`, `L1-`, etc.) and follow the same frontmatter schema. The differences are in how they participate in the dependency graph:
+
+- **Ephemeral → permanent `depends`: one-way.** An ephemeral file may `depends` on permanent files. The permanent files do **not** add matching `dependents` entries. Since `dependents` carries [no semantic weight](#113-dependents), this does not affect staleness detection.
+- **Permanent → ephemeral `depends`: forbidden.** A permanent file must never `depends` on an ephemeral file. This ensures deleting ephemeral files never creates dangling references in permanent documentation.
+- **Ephemeral → ephemeral: normal rules.** Ephemeral files that form their own subgraph (e.g. a plan with a detailed design underneath) use standard bidirectional `depends`/`dependents` edges. They share a lifecycle and are deleted together.
+
+Staleness tracking works normally for ephemeral files: if a permanent dependency is modified, the ephemeral file is flagged stale. The difference is that staleness never propagates _from_ an ephemeral file into permanent files, because no permanent file depends on it.
+
+```yaml
+# Example: feature plan depending on permanent auth contracts
+---
+scope: L1
+lifecycle: ephemeral
+summary: "Auth refactor plan — migrate to OAuth2 PKCE"
+modified: 2026-02-27
+reviewed: 2026-02-27
+depends:
+  - path: docs/L1-authentication
+    section: "2. Token lifecycle"
+---
+```
 
 ## 2. File Naming
 
