@@ -47,3 +47,7 @@ nav:
   - File Structure: L0-file-structure.md
   - Documentation Style: L0-documentation-style.md
   - Tooling: L0-tooling.md
+  - Assertions: L0-assertions.md
+  - Assertion Format: L1-assertions.md
+  - Agent Reference Sentinel: L3-agent-reference.md
+  - Agent Setup: agent-setup.md

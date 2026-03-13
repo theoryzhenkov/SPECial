@@ -1,22 +1,24 @@
 ---
 scope: root
 summary: "SPECial standard"
-modified: 2026-02-23
-reviewed: 2026-02-23
+modified: 2026-03-16
+reviewed: 2026-03-16
 dependents:
   - docs/L0-project-structure
   - docs/L0-file-structure
   - docs/L0-documentation-style
   - docs/L0-tooling
+  - docs/L0-assertions
+  - docs/L3-agent-reference
 ---
 
 # SPECial
 
 ## 1. Overview
 
-SPECial is a lightweight specification standard. It is designed to improve the efficiency of creating, using and maintaining documentation. By providing a style guide, a file & directory structure, and an operational pipeline, SPECial assists human & LLM agents both in managing context, navigating documentation, ensuring specification consistency with code and other tasks.
+SPECial is a lightweight specification standard. It provides a style guide, a file structure, and an operational pipeline that help human and LLM agents manage context, navigate documentation, and keep specifications consistent with code.
 
-## When to use SPECial?
+## 1.1. When to use SPECial
 
 Use SPECial when you have non-trivial amount of interconnected domains that need documentation and are subject to modification over time. SPECial is specifically optimised towards projects that employ LLM agents as active contributors / maintainers, but it is perfectly suitable for human-only usage.
 
@@ -68,6 +70,8 @@ Add the matching `dependents` entry in `docs/L0-auth.md` pointing back to `docs/
 ### 2.3. What next?
 
 The full standard is covered across three L0 documents. [File structure](L0-file-structure.md) goes deeper on frontmatter, scope levels, and the staleness mechanism you saw in step 2.2. [Project structure](L0-project-structure.md) covers configuration and path resolution if you need to customise the layout. [Documentation style](L0-documentation-style.md) covers writing conventions for the file bodies themselves.
+
+To make specs testable, see [Assertions](L0-assertions.md) — a mechanism for declaring verifiable claims in specs and linking them to tests. For AI agent integration, see [Agent setup](agent-setup.md).
 
 ---
 

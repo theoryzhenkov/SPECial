@@ -2,7 +2,7 @@
 scope: L0
 summary: "SPECial file standard"
 modified: 2026-02-27
-reviewed: 2026-02-27
+reviewed: 2026-03-16
 depends:
   - path: index
     local: "Pages"
@@ -11,6 +11,9 @@ depends:
     local: "File Naming"
 dependents:
   - docs/L0-tooling
+  - docs/L0-assertions
+  - docs/L1-assertions
+  - docs/L3-agent-reference
 ---
 
 # SPECial file structure
@@ -222,7 +225,7 @@ SPECial uses `summary` and the dependency graph for incremental navigation — b
 
 Each file's `summary` is the authoritative one-line description of its contents. An agent encountering a file path in a `dependents` list can read just the frontmatter of the referenced file to get its summary and scope, then decide whether to load the full body.
 
-By convention, SPECial files may list their dependants' summaries in the file body. This avoids fetching all dependants' frontmatter to learn their approximate contents. As with other content, if a dependant's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#114-modified-reviewed).
+By convention, SPECial files may list their dependents' summaries in the file body. This avoids fetching all dependents' frontmatter to learn their approximate contents. As with other content, if a dependent's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#114-modified-reviewed).
 
 ### 3.2. Root Index File
 

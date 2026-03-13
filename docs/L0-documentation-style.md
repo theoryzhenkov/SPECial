@@ -1,11 +1,12 @@
 ---
 scope: L0
 summary: "SPECial style guide"
-modified: 2026-02-23
-reviewed: 2026-02-23
+modified: 2026-03-16
+reviewed: 2026-03-16
 depends:
   - path: index
 dependents:
+  - docs/L3-agent-reference
 ---
 
 # Documentation style
@@ -26,8 +27,4 @@ Where these references conflict with each other, prefer Google. Where any of the
 
 !!! note
     Diátaxis is particularly relevant to SPECial's scope hierarchy — its four documentation modes map loosely onto SPECial's scope levels, though the alignment is not one-to-one.
-    
-## 2. LLM Agents
-
-
 

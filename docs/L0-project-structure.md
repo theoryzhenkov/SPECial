@@ -2,13 +2,14 @@
 scope: L0
 summary: "SPECial project structure standard"
 modified: 2026-02-27
-reviewed: 2026-02-27
+reviewed: 2026-03-16
 depends:
   - path: index
     local: "Pages"
 dependents:
   - docs/L0-file-structure
   - docs/L0-tooling
+  - docs/L3-agent-reference
 ---
 
 # SPECial project structure
