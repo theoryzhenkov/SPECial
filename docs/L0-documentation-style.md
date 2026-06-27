@@ -2,7 +2,7 @@
 scope: L0
 summary: "SPECial style guide"
 modified: 2026-03-16
-reviewed: 2026-03-16
+reviewed: 2026-06-27
 depends:
   - path: index
 dependents:

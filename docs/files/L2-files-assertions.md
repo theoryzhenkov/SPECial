@@ -1,27 +1,28 @@
 ---
-scope: L1
-summary: "Assertion format, test linking conventions, staleness integration"
-modified: 2026-03-15
-reviewed: 2026-03-15
+scope: L2
+summary: "Assertion table format, test and code linking, coverage, staleness integration"
+modified: 2026-06-27
+reviewed: 2026-06-27
 depends:
-  - path: docs/L0-assertions
-  - path: docs/L0-file-structure
+  - path: index
+  - path: docs/files/L0-files
+  - path: docs/files/L1-files-assertions
+  - path: docs/files/L1-files
     section: "1.1.2. Depends"
     local: "4. Cross-spec assertions"
-  - path: docs/L0-file-structure
-    section: "1.1.4. Modified & Reviewed"
-    local: "5. Staleness integration"
 dependents:
+  - docs/L0-tooling
+  - docs/L0-divergence
   - docs/L3-agent-reference
 ---
 
 # Assertion format
 
-This document defines the assertion table format, test linking conventions, and how assertions integrate with SPECial's staleness mechanism.
+This document defines the assertion table format, the test- and code-linking conventions, coverage requirements, and how assertions integrate with SPECial's staleness mechanism. The assertion *requirement* is in [L1-files-assertions](L1-files-assertions.md).
 
 ## 1. Assertion tables
 
-Assertions are declared in the spec body as Markdown tables under a heading that contains the word "Assertions". A spec file may have multiple assertion sections (e.g., one per domain concept).
+Assertions are declared in the spec body as Markdown tables under a heading that contains the word "Assertions". A spec file may have multiple assertion sections (e.g., one per section or per domain concept).
 
 ### 1.1. Table schema
 
@@ -117,15 +118,40 @@ The mapping rule: `tests/spec/<spec-name>/<assertion-id>.<ext>`. The `spec/` dir
 
 The file convention provides discoverability — you can see which assertions have tests by listing the directory. The comment convention provides flexibility — a single test can verify multiple assertions, and tests can live anywhere.
 
+### 2.3. Code linking
+
+Implementation code may reference the assertion it implements using the same `# spec:` comment convention as tests:
+
+```python
+# src/auth/token.py
+# spec: docs/auth/L1-auth#token-fields
+def issue_token(user):
+    ...
+```
+
+Code→spec links are **advisory navigation**, not a staleness-tracked edge. They carry no semantic weight — like `dependents` — because code is not part of the staleness graph: there is no edge from a spec to a source file, so a code change cannot flag the spec, and a spec change cannot be verified against code by the `reviewed < modified` rule. This is the same limitation that applies to [realization](L1-files-assertions.md#5-realization).
+
+The verifiable relationship remains the **test→spec** link: a test proves the assertion, and coverage is derived from that. A code comment only helps a reader *find* the governing spec; it does not establish that the code satisfies it. Treat code→spec links as discoverability aids, in keeping with derive-over-assert: the truth of "this code implements spec X" comes from the test, not from the comment.
+
+To keep code comments from rotting, tooling validates that every referenced assertion ID exists — a dangling reference (assertion renamed or removed) is flagged, the way doc-comment checkers validate references across markdown and source. This dangling-ref check replaces graph staleness, which cannot reach code. Optionally, change-level traceability can use Conventional Commits footers, which are immutable and coarse-grained:
+
+```
+feat(auth): refresh token rotation
+
+Specs: docs/auth/L1-auth#token-fields
+```
+
 ## 3. Coverage reporting
 
-Tooling can report assertion coverage by cross-referencing assertion tables in spec files with test-linking comments or file conventions. The key metrics:
+Coverage is **required**, not advisory. Every MUST assertion MUST have at least one linked test — complete coverage. SHOULD and MAY assertions SHOULD and MAY be covered respectively. SPECial prescribes this minimum; projects may enforce stricter thresholds or CI gates on top.
+
+Tooling reports assertion coverage by cross-referencing assertion tables in spec files with test-linking comments or file conventions. The key metrics:
 
 - **Covered assertions**: assertions with at least one linked test.
-- **Uncovered assertions**: assertions with no linked tests. MUST assertions without tests are higher priority.
+- **Uncovered assertions**: assertions with no linked tests. MUST assertions without tests are violations.
 - **Orphan tests**: tests with `spec:` comments pointing to assertion IDs that don't exist in any spec.
 
-Coverage reporting is advisory. SPECial does not prescribe thresholds or CI gates — projects decide their own enforcement level.
+Coverage is the [realization](L1-files-assertions.md#5-realization) signal: a spec is realized to the degree its assertions are covered by passing tests, so the coverage view doubles as the realization view.
 
 ## 4. Cross-spec assertions
 
@@ -151,7 +177,7 @@ Assertions extend SPECial's existing staleness mechanism rather than introducing
 
 When a spec file containing assertions is modified, its `modified` date bumps. Any files listed in its `dependents` — including test directories or test metadata files — are flagged stale if their `reviewed` date predates the spec's `modified` date.
 
-To make this work, test directories or sentinel files within them participate in the dependency graph. Projects using sentinel files must include the test directory in [`paths`](L0-project-structure.md#1-configuration) in `special.conf.toml` so that SPECial tooling can discover them.
+To make this work, test directories or sentinel files within them participate in the dependency graph. Projects using sentinel files must include the test directory in [`paths`](L2-files.md#3-configuration) in `special.conf.toml` so that SPECial tooling can discover them.
 
 ```yaml
 # docs/L1-auth.md
@@ -176,3 +202,13 @@ depends:
 When `docs/L1-auth.md` is modified, the sentinel file's `reviewed < modified` flags the test suite for review. After updating tests to match the changed assertions, bump the sentinel's `reviewed` date.
 
 Projects that don't want sentinel files can track staleness through the comment convention alone — tooling parses `spec:` comments and compares test file modification dates against spec modification dates. The sentinel approach is more explicit; the comment approach is lighter weight.
+
+## 6. Assertions
+
+| ID                    | Sev. | Assertion                                                                          |
+| --------------------- | ---- | ---------------------------------------------------------------------------------- |
+| assertion-table-format | MUST | Assertions appear as Markdown tables under a heading containing "Assertions".     |
+| unique-ids            | MUST | Assertion IDs are unique within their spec file.                                  |
+| severity-column       | MUST | The Sev. column is an RFC 2119 keyword (`MUST`, `SHOULD`, or `MAY`).            |
+| must-coverage         | MUST | Every MUST assertion has at least one linked test.                                 |
+| code-link-advisory    | MAY  | Implementation code may reference assertions via the `spec:` comment; such links carry no staleness weight. |

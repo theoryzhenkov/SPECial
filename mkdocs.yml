@@ -1,5 +1,5 @@
 site_name: SPECial
-site_description: A lightweight specification / documentation standard for spec-driven development
+site_description: A specification / documentation standard for spec-driven development
 repo_url: https://github.com/the-o-space/special
 repo_name: the-o-space/special
 
@@ -43,11 +43,13 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Project Structure: L0-project-structure.md
-  - File Structure: L0-file-structure.md
+  - Files: files/L0-files.md
+  - File Contracts: files/L1-files.md
+  - File Structure: files/L2-files.md
+  - Assertions: files/L1-files-assertions.md
+  - Assertion Format: files/L2-files-assertions.md
   - Documentation Style: L0-documentation-style.md
   - Tooling: L0-tooling.md
-  - Assertions: L0-assertions.md
-  - Assertion Format: L1-assertions.md
+  - Divergence: L0-divergence.md
   - Agent Reference Sentinel: L3-agent-reference.md
   - Agent Setup: agent-setup.md

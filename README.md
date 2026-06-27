@@ -1,6 +1,6 @@
 # SPECial
 
-SPECial is a lightweight specification / documentation standard. It is designed to provide a solid foundation for spec-driven software development, but is adaptable to other domains.
+SPECial is a specification / documentation standard. It provides a solid foundation for spec-driven development, and is adaptable to other domains.
 
 > [!note]
 > Currently, SPECial doesn't provide any tooling: linters, formatters, drift detection, etc. If the standard's design receives wider adoption, I plan to develop a SPECial CLI / SDK.

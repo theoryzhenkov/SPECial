@@ -1,24 +1,23 @@
 ---
-scope: L0
-summary: "SPECial file standard"
-modified: 2026-02-27
-reviewed: 2026-03-16
+scope: L1
+summary: "Frontmatter schema and staleness contracts"
+modified: 2026-06-27
+reviewed: 2026-06-27
 depends:
   - path: index
-    local: "Pages"
-  - path: docs/L0-project-structure
-    section: "Path Resolution"
-    local: "File Naming"
+  - path: docs/files/L0-files
 dependents:
+  - docs/files/L1-files-assertions
+  - docs/files/L2-files
+  - docs/files/L2-files-assertions
   - docs/L0-tooling
-  - docs/L0-assertions
-  - docs/L1-assertions
+  - docs/L0-divergence
   - docs/L3-agent-reference
 ---
 
-# SPECial file structure
+# File contracts
 
-Markdown SPECial files include a **body** and YAML, TOML or JSON **frontmatter**. While documentation for a project can consist of files other than Markdown, SPECial relies on some sort of per-file metadata storage to provide assistance with specification drift and navigation.
+This document defines the frontmatter schema and the staleness invariants that govern SPECial files. Motivation is in [L0-files](L0-files.md); file naming, domain structure, and configuration are in [L2-files](L2-files.md).
 
 ## 1. Frontmatter
 
@@ -44,13 +43,16 @@ dependents:
 | Field        | Type       | Required | Description                                                            |
 | ------------ | ---------- | -------- | ---------------------------------------------------------------------- |
 | `scope`      | `enum`     | yes      | Depth of detail: `root`, L0–L3. Also expressed in file name.           |
-| `summary`    | `string`   | yes      | One-line description, used for [navigation](#3-navigation).            |
+| `summary`    | `string`   | yes      | One-line description, used for [navigation](L2-files.md#2-navigation).  |
 | `modified`   | `date`     | yes      | Last content change, ISO 8601.                                         |
 | `reviewed`   | `date`     | yes      | Last verified consistency timestamp, ISO 8601.                         |
 | `lifecycle`  | `enum`     | no       | `permanent` (default) or `ephemeral`. See [Lifecycle](#115-lifecycle). |
 | `type`       | `string`   | no       | Document type. Also expressed in file name. See [Type](#116-type).     |
+| `status`     | `string`   | no       | Lifecycle status of a typed doc. See [Status](#117-status).           |
 | `depends`    | `object[]` | no       | This file can become stale after changes to these files.               |
 | `dependents` | `object[]` | no       | These files can become stale after changes to this file.               |
+
+A file's domain is derived from its path, not a frontmatter field. See [Domain and subdomain](L2-files.md#13-domain-and-subdomain).
 
 #### 1.1.1. Scope
 
@@ -115,7 +117,7 @@ The staleness rule: if Y depends on X, and `Y.reviewed < X.modified`, then Y is 
 
 Some [document types](#116-type) default to `ephemeral`. An explicit `lifecycle` value in frontmatter always takes precedence over the type-implied default.
 
-Lifecycle can also be encoded in [file naming](#2-file-naming) via the `EPH` prefix or `eph/` directory segment. Frontmatter is the source of truth.
+Lifecycle can also be encoded in [file naming](L2-files.md#1-file-naming) via the `EPH` prefix or `eph/` directory segment. Frontmatter is the source of truth.
 
 Ephemeral files follow the same frontmatter schema as permanent files. The differences are in how they participate in the dependency graph:
 
@@ -137,107 +139,36 @@ The type set is open — any uppercase string is valid. The following types are 
 | `PLAN`   | Implementation plans, feature designs            | `ephemeral`       |
 | `ISSUE`  | Tracked problems, bugs, improvement requests     | `ephemeral`       |
 | `RFC`    | Requests for comment, proposals under discussion | `ephemeral`       |
+| `DEVIATION` | Recorded divergences between spec and implementation | `permanent`   |
 
 When a type has a default lifecycle, that default applies unless overridden by an explicit `lifecycle` field. Custom types default to `permanent`.
 
-Type can also be encoded in [file naming](#2-file-naming) via a filename prefix or directory segment. Frontmatter is the source of truth.
+`DEVIATION` is the one recommended type that defaults to `permanent` — a deviation is a durable fact about the system, not temporary work. Deviation registers are covered in [Divergence](../L0-divergence.md).
 
-## 2. File Naming
+Type can also be encoded in [file naming](L2-files.md#12-type-and-lifecycle-encoding) via a filename prefix or directory segment. Frontmatter is the source of truth.
 
-SPECial files encode metadata in two places: **frontmatter** (source of truth) and the **file path** (discoverability aid). The file path can encode scope, [type](#116-type), and [lifecycle](#115-lifecycle) using filename prefixes or directory segments interchangeably.
+#### 1.1.7. Status
 
-### 2.1. Scope prefix
+`status` records where a typed document sits in its own lifecycle — distinct from [`lifecycle`](#115-lifecycle) (how long the document lives) and from [realization](L1-files-assertions.md#5-realization) (whether code matches the spec). It applies to typed documents whose purpose implies a life cycle: plans, issues, RFCs. Permanent, un-typed specifications carry no `status` — their state is [realization](L1-files-assertions.md#5-realization), derived from assertions.
 
-Every SPECial file encodes its scope level as a filename prefix:
+The value set is open; recommended values are conventional per type:
 
-```
-L0-security.md
-L1-authentication.md
-L2-auth-flow.md
-L3-token-validation.md
-```
+| Type        | Recommended status values                                      |
+| ----------- | -------------------------------------------------------------- |
+| `PLAN`      | `draft` → `accepted` → `in-progress` → `done` \| `abandoned`  |
+| `RFC`       | `draft` → `accepted` → `superseded`                           |
+| `ISSUE`     | `open` → `resolved` \| `wont-fix`                             |
+| `DEVIATION` | _(no `status`; the register's `disposition` column covers it)_ |
 
-The prefix makes scope immediately visible in file listings and allows tools to infer scope without parsing frontmatter.
+A status change is a content change: bump `modified`, and staleness propagates to dependents normally. When an ephemeral document reaches a terminal status (`done`, `resolved`, `superseded`, `abandoned`), it is a candidate for deletion under its [ephemeral lifecycle](#115-lifecycle).
 
-### 2.2. Type and lifecycle encoding
+## 2. Assertions
 
-Type and lifecycle can each be expressed as an **uppercase filename prefix** or a **lowercase directory segment**. These two forms are interchangeable — a project may use either or both, as long as the encoding is consistent with frontmatter.
-
-| Encoding              | Filename prefix | Directory segment |
-| --------------------- | --------------- | ----------------- |
-| Type (e.g. `PLAN`)    | `PLAN-`         | `plan/`           |
-| Lifecycle `ephemeral` | `EPH-`          | `eph/`            |
-
-The ordering of lifecycle, type, and scope segments in the file path is a project-level convention. SPECial does not enforce a particular order — choose whichever grouping makes navigating your documentation easiest and stay consistent within the project. The [SPECial CLI](L0-tooling.md) reads the configured order from [`naming_order`](L0-project-structure.md#1-configuration) in `special.conf.toml`.
-
-All of the following encode the same file (`lifecycle: ephemeral`, `type: PLAN`, `scope: L1`):
-
-```
-# lifecycle → type → scope (default)
-docs/security/EPH-PLAN-L1-auth-refactor.md
-docs/security/eph/plan/L1-auth-refactor.md
-
-# type → lifecycle → scope
-docs/security/PLAN-EPH-L1-auth-refactor.md
-docs/security/plan/eph/L1-auth-refactor.md
-
-# type → scope (lifecycle implied by type)
-docs/security/PLAN-L1-auth-refactor.md
-docs/security/plan/L1-auth-refactor.md
-```
-
-Standard permanent documentation uses neither type nor lifecycle encoding — just the scope prefix:
-
-```
-docs/security/L0-security.md
-```
-
-When type already implies ephemeral lifecycle (e.g. `PLAN`), the `EPH` encoding is redundant and can be omitted:
-
-```
-docs/security/plan/L1-auth-refactor.md      # type implies ephemeral
-docs/security/PLAN-L1-auth-refactor.md       # same, prefix style
-```
-
-### 2.3. Glob patterns
-
-The two encoding styles give different glob ergonomics. Choose whichever fits the project:
-
-```
-# prefix style
-L1-*.md              →  all standard L1 contracts
-PLAN-*.md            →  all plans (any scope)
-PLAN-L1-*.md         →  all L1 plans
-EPH-*.md             →  all ephemeral files (prefix-encoded)
-*L1-*.md             →  all L1 files including typed ones
-
-# directory style
-plan/L1-*.md         →  all L1 plans
-plan/**/*.md         →  all plans (any scope)
-eph/**/*.md          →  all ephemeral files (directory-encoded)
-```
-
-## 3. Navigation
-
-SPECial uses `summary` and the dependency graph for incremental navigation — both for human readers and agents managing context budgets.
-
-### 3.1. Summary
-
-Each file's `summary` is the authoritative one-line description of its contents. An agent encountering a file path in a `dependents` list can read just the frontmatter of the referenced file to get its summary and scope, then decide whether to load the full body.
-
-By convention, SPECial files may list their dependents' summaries in the file body. This avoids fetching all dependents' frontmatter to learn their approximate contents. As with other content, if a dependent's summary is updated, `modified` is bumped, and changes propagate via the [staleness mechanism](#114-modified-reviewed).
-
-### 3.2. Root Index File
-
-A **root index file** (configured as `root` in `special.conf.toml`, default: `README`) serves as the entry point, effectively an `L-1` scope. It may or may not list `L0` files as dependents — [file discovery](#2-file-naming) does not depend on it.
-
-```yaml
-# README.md
----
-scope: root
-summary: "Project documentation index"
-modified: 2026-01-05
-reviewed: 2026-01-05
----
-# My Project
-```
+| ID                          | Sev.   | Assertion                                                                                    |
+| --------------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| required-fields             | MUST   | Every SPECial file declares `scope`, `summary`, `modified`, and `reviewed`.                 |
+| staleness-rule              | MUST   | If Y depends on X and `Y.reviewed < X.modified`, Y is potentially stale.                     |
+| depends-source-of-truth     | MUST   | `depends` is the source of truth for staleness; `dependents` is a navigation aid only.      |
+| edge-symmetry               | SHOULD | Every `depends` edge has a matching `dependents` edge and vice versa.                       |
+| no-permanent-on-ephemeral   | MUST   | A permanent file never depends on an ephemeral file.                                         |
+| type-default-lifecycle      | MAY    | A type's default lifecycle applies unless overridden by an explicit `lifecycle` field.       |

@@ -41,7 +41,8 @@ dependents:
 | `depends`    | no       | Files that can make this file stale when changed         |
 | `dependents` | no       | Files that this file can make stale (navigation aid)     |
 | `lifecycle`  | no       | `permanent` (default) or `ephemeral`                     |
-| `type`       | no       | Document type: `PLAN`, `ISSUE`, `RFC`, or custom         |
+| `type`       | no       | Document type: `PLAN`, `ISSUE`, `RFC`, `DEVIATION`, or custom |
+| `status`     | no       | Lifecycle status of a typed doc (e.g. `draft`, `accepted`, `done`) |
 
 All paths are relative to the project root, without `.md` extension.
 
@@ -70,6 +71,18 @@ eph/plan/L1-auth-refactor.md        # same, directory-style
 
 The segment order (lifecycle, type, scope) is configurable via `naming_order` in `special.conf.toml`. Frontmatter is always the source of truth — the file path is a discoverability aid.
 
+### Domain structure
+
+Files may be grouped into optional domain/subdomain directories. The directory is the source of truth for a file's domain; the filename may mirror it for flat-list self-description (domain has no frontmatter field — it is derived from the path):
+
+```
+docs/auth/L0-auth.md                       # domain dir + filename
+docs/auth/oidc/L2-auth-oidc-token-flow.md  # subdomain, mirrored in filename
+docs/L0-auth.md                            # filename-only (no domain dir)
+```
+
+Domain is not a `naming_order` segment — it forms the trailing name portion, after the lifecycle/type/scope prefixes.
+
 ## Staleness
 
 Two dates track drift between files:
@@ -83,7 +96,7 @@ Two dates track drift between files:
 
 ## Assertions
 
-Spec files can declare testable claims — assertions — that tests reference by ID. This bridges specifications and tests: the spec says *what* must hold, the test proves *whether* it holds.
+Spec files declare testable claims — assertions — that tests reference by ID. This bridges specifications and tests: the spec says *what* must hold, the test proves *whether* it holds. L1–L3 specs require an assertion table per section of testable behavior, with complete coverage of every MUST assertion; L0 motivation docs are exempt.
 
 ### Assertion tables
 
@@ -118,6 +131,8 @@ Or via a file convention where test paths mirror spec paths:
 tests/spec/<spec-name>/<assertion-id>.<ext>
 ```
 
+Implementation code may use the same `# spec: path#id` comment to point at the assertion it implements; these links are advisory (no staleness weight) — the verifiable link is the test.
+
 ### Working with assertions
 
 When implementing against a spec with assertions:
@@ -125,7 +140,15 @@ When implementing against a spec with assertions:
 1. Read the assertion table as acceptance criteria
 2. Write tests for assertions (TDD red)
 3. Implement until tests pass (green)
-4. Verify coverage: every `MUST` assertion should have at least one linked test
+4. Verify coverage: every `MUST` assertion must have at least one linked test (complete coverage)
+
+## Realization
+
+Realization — whether code does what a spec says — is **derived**, not asserted. A permanent spec with assertions is realized to the degree its assertions are covered by linked, passing tests. There is no `realized` field: a hand-maintained status would drift the moment code ships without a doc update. Specs without assertions (e.g. L0 context docs) have no derivable realization — if you need to track it, add assertions.
+
+## Divergence
+
+When the implementation *intentionally* differs from a spec and both are kept, record it in a deviation register — a `type: DEVIATION` file with a Deviations table (Ref, Spec says, Reality, Rationale, Disposition). The register `depends` on every spec it references, so divergences show up in those specs' `dependents` and participate in staleness. Do not edit a divergence back into the spec — keep intent and reality separate.
 
 ## When modifying SPECial files
 
@@ -133,13 +156,15 @@ When implementing against a spec with assertions:
 2. Check `dependents` — downstream files may now be stale
 3. If you change a file and a dependent's `reviewed < modified`, flag it
 
-When modifying code covered by a SPECial spec, check if the change diverges from the specification. If it does, flag the divergence — either the code or the spec needs updating.
+When modifying code covered by a SPECial spec, check if the change diverges from the specification. If the divergence is intentional and standing, record it in a deviation register. If it's a defect, fix the code. If the spec is wrong, update the spec.
 
 ## Full documentation
 
-- [Project structure](https://the-o-space.github.io/special/L0-project-structure/)
-- [File structure](https://the-o-space.github.io/special/L0-file-structure/)
+- [Files](https://the-o-space.github.io/special/files/L0-files/)
+- [File contracts](https://the-o-space.github.io/special/files/L1-files/)
+- [File structure](https://the-o-space.github.io/special/files/L2-files/)
+- [Assertions](https://the-o-space.github.io/special/files/L1-files-assertions/)
+- [Assertion format](https://the-o-space.github.io/special/files/L2-files-assertions/)
 - [Documentation style](https://the-o-space.github.io/special/L0-documentation-style/)
-- [Assertions](https://the-o-space.github.io/special/L0-assertions/)
-- [Assertion format](https://the-o-space.github.io/special/L1-assertions/)
+- [Divergence](https://the-o-space.github.io/special/L0-divergence/)
 - [Tooling](https://the-o-space.github.io/special/L0-tooling/)
