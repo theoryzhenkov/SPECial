@@ -4,6 +4,8 @@ Reference for working with projects that use the [SPECial](https://theoryzhenkov
 
 ## Orientation
 
+> Complete reference: [Home](https://theoryzhenkov.github.io/SPECial/)
+
 A SPECial project is identified by `special.conf.toml` at its root:
 
 ```toml
@@ -14,6 +16,8 @@ paths = ["."]         # directories containing spec files (default: ["."])
 Start by reading the `root` file. It lists top-level domains as `dependents`. Each domain has a `summary` in its frontmatter — read summaries to decide which files are relevant before loading full bodies.
 
 ## Frontmatter
+
+> Complete reference: [File contracts](https://theoryzhenkov.github.io/SPECial/files/L1-files/)
 
 Every SPECial file has YAML frontmatter:
 
@@ -48,6 +52,8 @@ All paths are relative to the project root, without `.md` extension.
 
 ## Scope Levels
 
+> Complete reference: [File contracts](https://theoryzhenkov.github.io/SPECial/files/L1-files/)
+
 | Level  | Answers                                              | When to read                                    |
 | ------ | ---------------------------------------------------- | ----------------------------------------------- |
 | `root` | What domains exist?                                  | First, to orient and pick a domain              |
@@ -59,6 +65,8 @@ All paths are relative to the project root, without `.md` extension.
 Scope is encoded in the filename prefix: `L0-auth.md`, `L1-auth.md`, etc.
 
 ## File Naming
+
+> Complete reference: [File structure](https://theoryzhenkov.github.io/SPECial/files/L2-files/)
 
 SPECial files encode metadata in the file path. Scope is always a prefix. Type and lifecycle can appear as uppercase filename prefixes or lowercase directory segments:
 
@@ -85,6 +93,8 @@ Domain is not a `naming_order` segment — it forms the trailing name portion, a
 
 ## Staleness
 
+> Complete reference: [File contracts](https://theoryzhenkov.github.io/SPECial/files/L1-files/)
+
 Two dates track drift between files:
 
 - **`modified`**: bump when you change a file's content. Editing does *not* bump `reviewed`.
@@ -95,6 +105,8 @@ Two dates track drift between files:
 `depends` is the source of truth for staleness. `dependents` is a navigation aid (the inverse edges) with no semantic weight.
 
 ## Assertions
+
+> Complete reference: [Assertions](https://theoryzhenkov.github.io/SPECial/files/L1-files-assertions/)
 
 Spec files declare testable claims — assertions — that tests reference by ID. This bridges specifications and tests: the spec says *what* must hold, the test proves *whether* it holds. L1–L3 specs require an assertion table per section of testable behavior, with complete coverage of every MUST assertion; L0 motivation docs are exempt.
 
@@ -144,9 +156,13 @@ When implementing against a spec with assertions:
 
 ## Realization
 
+> Complete reference: [Assertions](https://theoryzhenkov.github.io/SPECial/files/L1-files-assertions/)
+
 Realization — whether code does what a spec says — is **derived**, not asserted. A permanent spec with assertions is realized to the degree its assertions are covered by linked, passing tests. There is no `realized` field: a hand-maintained status would drift the moment code ships without a doc update. Specs without assertions (e.g. L0 context docs) have no derivable realization — if you need to track it, add assertions.
 
 ## Divergence
+
+> Complete reference: [Divergence](https://theoryzhenkov.github.io/SPECial/L0-divergence/)
 
 When the implementation *intentionally* differs from a spec and both are kept, record it in a deviation register — a `type: DEVIATION` file with a Deviations table (Ref, Spec says, Reality, Rationale, Disposition). The register `depends` on every spec it references, so divergences show up in those specs' `dependents` and participate in staleness. Do not edit a divergence back into the spec — keep intent and reality separate.
 
