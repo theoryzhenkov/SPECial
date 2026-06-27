@@ -8,7 +8,7 @@ Download `special.md` and place it in your agent's documentation directory:
 
 ```bash
 # Claude Code
-curl -o .claude/docs/SPECial.md https://the-o-space.github.io/special/special.md
+curl -o .claude/docs/SPECial.md https://theoryzhenkov.github.io/SPECial/special.md
 
 # Or manually download and place at .claude/docs/SPECial.md
 ```

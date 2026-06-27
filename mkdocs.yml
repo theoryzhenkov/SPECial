@@ -1,7 +1,7 @@
 site_name: SPECial
 site_description: A specification / documentation standard for spec-driven development
-repo_url: https://github.com/the-o-space/special
-repo_name: the-o-space/special
+repo_url: https://github.com/theoryzhenkov/SPECial
+repo_name: theoryzhenkov/SPECial
 
 theme:
   name: material

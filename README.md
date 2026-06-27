@@ -5,4 +5,4 @@ SPECial is a specification / documentation standard. It provides a solid foundat
 > [!note]
 > Currently, SPECial doesn't provide any tooling: linters, formatters, drift detection, etc. If the standard's design receives wider adoption, I plan to develop a SPECial CLI / SDK.
 
-Full documentation is available at the [SPECial docs site](https://the-o-space.github.io/special/).
+Full documentation is available at the [SPECial docs site](https://theoryzhenkov.github.io/SPECial/).

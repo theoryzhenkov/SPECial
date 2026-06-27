@@ -1,6 +1,6 @@
 # SPECial — Agent Reference
 
-Reference for working with projects that use the [SPECial](https://the-o-space.github.io/special/) documentation standard. Install this file at `.claude/docs/SPECial.md` (or equivalent) so agents can work with SPECial-documented codebases.
+Reference for working with projects that use the [SPECial](https://theoryzhenkov.github.io/SPECial/) documentation standard. Install this file at `.claude/docs/SPECial.md` (or equivalent) so agents can work with SPECial-documented codebases.
 
 ## Orientation
 
@@ -160,11 +160,11 @@ When modifying code covered by a SPECial spec, check if the change diverges from
 
 ## Full documentation
 
-- [Files](https://the-o-space.github.io/special/files/L0-files/)
-- [File contracts](https://the-o-space.github.io/special/files/L1-files/)
-- [File structure](https://the-o-space.github.io/special/files/L2-files/)
-- [Assertions](https://the-o-space.github.io/special/files/L1-files-assertions/)
-- [Assertion format](https://the-o-space.github.io/special/files/L2-files-assertions/)
-- [Documentation style](https://the-o-space.github.io/special/L0-documentation-style/)
-- [Divergence](https://the-o-space.github.io/special/L0-divergence/)
-- [Tooling](https://the-o-space.github.io/special/L0-tooling/)
+- [Files](https://theoryzhenkov.github.io/SPECial/files/L0-files/)
+- [File contracts](https://theoryzhenkov.github.io/SPECial/files/L1-files/)
+- [File structure](https://theoryzhenkov.github.io/SPECial/files/L2-files/)
+- [Assertions](https://theoryzhenkov.github.io/SPECial/files/L1-files-assertions/)
+- [Assertion format](https://theoryzhenkov.github.io/SPECial/files/L2-files-assertions/)
+- [Documentation style](https://theoryzhenkov.github.io/SPECial/L0-documentation-style/)
+- [Divergence](https://theoryzhenkov.github.io/SPECial/L0-divergence/)
+- [Tooling](https://theoryzhenkov.github.io/SPECial/L0-tooling/)
